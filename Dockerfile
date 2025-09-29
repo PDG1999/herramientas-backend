@@ -49,10 +49,8 @@ COPY postgrest.conf /app/postgrest.conf
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
-# PostgreSQL-Datenverzeichnis erstellen
+# PostgreSQL-Datenverzeichnis erstellen (ohne User-Erstellung - existiert bereits)
 RUN mkdir -p /var/lib/postgresql/data && \
-    addgroup -g 70 postgres && \
-    adduser -u 70 -G postgres -h /var/lib/postgresql -s /bin/sh -D postgres && \
     chown -R postgres:postgres /var/lib/postgresql
 
 # Log-Verzeichnisse erstellen
