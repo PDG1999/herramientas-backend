@@ -1,0 +1,50 @@
+# Coolify-optimierte Docker Compose für SAMEBI Herramientas Backend
+# Alle Services in einem Container für einfacheres Deployment
+
+version: '3.8'
+
+services:
+  herramientas-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: herramientas_backend
+    environment:
+      - POSTGRES_DB=herramientas
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secure_password_123
+      - JWT_SECRET=your-jwt-secret-key-here-min-32-chars
+      - PGRST_DB_SCHEMAS=api
+      - PGRST_DB_ANON_ROLE=web_anon
+    ports:
+      - "3000:3000"
+      - "5432:5432"
+      - "6379:6379"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - redis_data:/var/lib/redis
+    restart: unless-stopped
+    # Coolify Labels
+    labels:
+      - "coolify.managed=true"
+      - "coolify.name=herramientas-backend"
+      - "coolify.http.domain=api.samebi.net"
+      - "coolify.http.port=3000"
+      - "coolify.health_check.enabled=true"
+      - "coolify.health_check.path=/health"
+      - "coolify.health_check.port=3000"
+      - "coolify.health_check.interval=30s"
+      - "coolify.health_check.timeout=10s"
+      - "coolify.health_check.retries=3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: herramientas_db
+    environment:
+      POSTGRES_DB: herramientas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secure_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seeds:/docker-entrypoint-initdb.d/02-seeds
+    networks:
+      - herramientas_network
+
+  postgrest:
+    image: postgrest/postgrest:v11.2.0
+    container_name: herramientas_api
+    environment:
+      PGRST_DB_URI: postgres://postgres:secure_password_123@postgres:5432/herramientas
+      PGRST_DB_SCHEMAS: api
+      PGRST_DB_ANON_ROLE: web_anon
+      PGRST_JWT_SECRET: your-jwt-secret-key-here-min-32-chars
+      PGRST_DB_POOL: 10
+      PGRST_DB_POOL_ACQUISITION_TIMEOUT: 10
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - herramientas_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: herramientas_cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - herramientas_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  herramientas_network:
+    driver: bridge
