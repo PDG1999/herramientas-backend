@@ -12,14 +12,15 @@ FROM redis:7-alpine AS redis-binary
 # Final Image mit allen Services
 FROM alpine:3.18
 
-# Abhängigkeiten installieren
+# Abhängigkeiten installieren (su-exec hinzugefügt!)
 RUN apk add --no-cache \
     postgresql15 \
     postgresql15-client \
     postgresql15-contrib \
     supervisor \
     curl \
-    bash
+    bash \
+    su-exec
 
 # PostgREST Binary kopieren
 COPY --from=postgrest-binary /bin/postgrest /usr/local/bin/postgrest
@@ -41,20 +42,29 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY postgresql.conf /etc/postgresql/postgresql.conf
 COPY pg_hba.conf /etc/postgresql/pg_hba.conf
 
+# PostgREST-Konfiguration
+COPY postgrest.conf /app/postgrest.conf
+
 # Startup-Script
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 # PostgreSQL-Datenverzeichnis erstellen
 RUN mkdir -p /var/lib/postgresql/data && \
+    addgroup -g 70 postgres && \
+    adduser -u 70 -G postgres -h /var/lib/postgresql -s /bin/sh -D postgres && \
     chown -R postgres:postgres /var/lib/postgresql
+
+# Log-Verzeichnisse erstellen
+RUN mkdir -p /var/log/supervisor /var/log/postgresql && \
+    chown -R postgres:postgres /var/log/postgresql
 
 # Ports exponieren
 EXPOSE 3000 5432 6379
 
-# Health Check
+# Health Check (curl ist jetzt installiert)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -f http://localhost:3000/ || exit 1
 
 # Supervisor starten
 CMD ["/app/start.sh"]

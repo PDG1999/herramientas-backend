@@ -12,27 +12,36 @@ mkdir -p /var/log/postgresql
 # PostgreSQL-Datenverzeichnis initialisieren falls nötig
 if [ ! -s "/var/lib/postgresql/data/PG_VERSION" ]; then
     echo "📊 Initializing PostgreSQL database..."
+    
+    # PostgreSQL initialisieren
     su-exec postgres initdb -D /var/lib/postgresql/data
     
-    # Schema und Seeds laden
-    echo "🗄️ Loading database schema..."
+    # PostgreSQL temporär starten für Setup
     su-exec postgres pg_ctl -D /var/lib/postgresql/data -l /var/log/postgresql/postgres.log start
     sleep 5
     
     # Datenbank und Schema erstellen
+    echo "🗄️ Creating database and schema..."
     su-exec postgres createdb herramientas
-    su-exec postgres psql -d herramientas -f /app/database/schema.sql
+    
+    # Schema laden
+    if [ -f "/app/database/schema.sql" ]; then
+        echo "📋 Loading database schema..."
+        su-exec postgres psql -d herramientas -f /app/database/schema.sql
+    fi
     
     # Seeds laden falls vorhanden
     if [ -d "/app/database/seeds" ]; then
         echo "🌱 Loading database seeds..."
         for seed_file in /app/database/seeds/*.sql; do
             if [ -f "$seed_file" ]; then
+                echo "Loading: $seed_file"
                 su-exec postgres psql -d herramientas -f "$seed_file"
             fi
         done
     fi
     
+    # PostgreSQL stoppen für Supervisor-Start
     su-exec postgres pg_ctl -D /var/lib/postgresql/data stop
     echo "✅ Database initialization complete"
 fi
@@ -49,12 +58,12 @@ echo "   - PostgREST Port: 3000"
 echo "   - Redis Port: 6379"
 echo "   - PostgreSQL Port: 5432"
 
-# Health Check Endpoint erstellen
+# Simple Health Check Endpoint erstellen
+mkdir -p /tmp
 cat > /tmp/health_check.sh << 'EOF'
 #!/bin/bash
-# Simple health check
-curl -f http://localhost:3000/ > /dev/null 2>&1
-if [ $? -eq 0 ]; then
+# Simple health check for PostgREST
+if curl -f http://localhost:3000/ > /dev/null 2>&1; then
     echo "healthy"
     exit 0
 else
