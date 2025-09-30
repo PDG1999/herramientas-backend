@@ -20,3 +20,4 @@ GRANT SELECT ON api.health_check TO web_anon;
 
 -- Test-Daten einfügen
 INSERT INTO api.health_check (status) VALUES ('healthy') ON CONFLICT DO NOTHING;
+

@@ -45,3 +45,4 @@ echo "Expected new logs:"
 echo "✅ 'INFO success: postgresql entered RUNNING state'"
 echo "✅ 'INFO success: postgrest entered RUNNING state'"
 echo "✅ 'Healthcheck status: healthy'"
+

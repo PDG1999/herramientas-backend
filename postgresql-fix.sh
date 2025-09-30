@@ -42,3 +42,4 @@ echo "✅ 'PostgreSQL started successfully'"
 echo "✅ 'PostgREST connected to database'"
 echo "✅ 'Health check: healthy'"
 echo "✅ 'API available on port 3000'"
+

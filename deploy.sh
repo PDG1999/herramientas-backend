@@ -90,3 +90,4 @@ echo "1. Ihre herramientas-backend App auswählen"
 echo "2. 'Deploy' Button klicken"
 echo "3. Logs beobachten - sollte jetzt Dockerfile finden"
 echo "4. Nach erfolgreichem Build: https://api.samebi.net testen"
+

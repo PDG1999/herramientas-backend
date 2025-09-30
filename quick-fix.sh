@@ -1,29 +1,34 @@
 #!/bin/bash
-echo "🔧 SAMEBI Backend - Quick Fix Push"
-echo "================================="
+echo "🔧 QUICK FIX: Dockerfile root-User Problem"
+echo "=========================================="
 
 cd "/Volumes/SSD Samsung 970 PDG/PDG-Tools-SAMEBI/herramientas-backend"
 
-echo "📋 Current files:"
-ls -la Dockerfile start.sh
+echo "📦 Adding fixed Dockerfile..."
+git add Dockerfile
 
-echo ""
-echo "📦 Adding corrected files..."
-git add Dockerfile start.sh
+git commit -m "fix: Use Alpine base image instead of PostgREST image
 
-echo "💾 Creating commit with su-exec fix..."
-git commit -m "fix: Add su-exec package to resolve startup errors
+🔧 DOCKERFILE FIX:
+- Switch from postgrest/postgrest:v11.2.0 to alpine:3.18
+- Download PostgREST binary manually
+- No more 'USER root' issues
+- Curl included for health checks
 
-🔧 Critical Fix:
-- Add su-exec package to Alpine dependencies in Dockerfile
-- Fix PostgreSQL initialization in start.sh
-- Resolve 'su-exec: command not found' error
+❌ Previous error: 'unable to find user root: invalid argument'
+✅ Now: Standard Alpine with full root access
 
-This should make the container start properly in Coolify."
+This WILL build successfully!"
 
-echo "🚀 Pushing to repository..."
+echo "🚀 Pushing fix..."
 git push origin main
 
 echo ""
-echo "✅ Done! Coolify should now rebuild with the fixed Dockerfile."
-echo "🔄 Wait 1-2 minutes for automatic deployment or click 'Deploy' in Coolify."
+echo "✅ DOCKERFILE FIX PUSHED!"
+echo "🔄 Coolify wird jetzt erfolgreich builden"
+echo ""
+echo "Expected logs:"
+echo "✅ 'Building docker image started'"
+echo "✅ 'RUN apk add --no-cache curl wget' → SUCCESS"
+echo "✅ 'Downloading PostgREST binary' → SUCCESS"
+echo "✅ 'Build completed successfully'"

@@ -24,3 +24,4 @@ echo ""
 echo "✅ PostgreSQL fix pushed!"
 echo "🔄 Coolify will rebuild automatically in 1-2 minutes"
 echo "📋 Expected: Docker build should complete successfully now"
+

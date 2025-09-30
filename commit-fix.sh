@@ -64,3 +64,4 @@ echo "✅ 'Starting SAMEBI Herramientas Backend...'"
 echo "✅ 'Database initialization complete'"
 echo "✅ 'Starting services with Supervisor...'"
 echo "✅ Health check: 'healthy'"
+
