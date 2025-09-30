@@ -17,9 +17,7 @@ RUN wget -O /tmp/postgrest.tar.xz https://github.com/PostgREST/postgrest/release
 # PostgREST-Konfiguration kopieren
 COPY postgrest.conf /etc/postgrest.conf
 
-# Health Check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:3000/ || exit 1
+# Health Check entfernt - wird von Coolify verwaltet
 
 # Port exponieren
 EXPOSE 3000
